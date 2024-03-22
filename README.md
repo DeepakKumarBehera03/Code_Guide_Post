@@ -1,4 +1,4 @@
-I am created this simple Code_Post website which allows all coders from biginning level to advance level also some blog about coding like about new era of AI, 
+I have created this simple Code_Post website which allows all coders from biginning level to advance level also some blog about coding like about new era of AI, 
 So any coder can post any code_blog and only the admin can update/delete the post, but if there is a another person seeing this code_post then he/she can't make any changes into this,
 But yes, he/she can comment on that post , that how the post looks like and if anyone want to make any documentation of any programming language then he/she can doit.
 because of this people can interacct with each other they can learn from each other.
