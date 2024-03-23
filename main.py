@@ -1,3 +1,4 @@
+import smtplib
 from datetime import date
 from flask import Flask, abort, render_template, redirect, url_for, flash
 from flask_bootstrap import Bootstrap5
@@ -10,11 +11,15 @@ from sqlalchemy import Integer, String, Text
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import relationship
-from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
+from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, ContactForm
+import requests
+import smtplib
 
+response = smtplib.SMTP("smtp.gmail.com", 587)
+response.starttls()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "deepakkumar"
+app.config['SECRET_KEY'] = "deepak"
 ckeditor = CKEditor(app)
 Bootstrap5(app)
 
@@ -28,7 +33,6 @@ def load_user(user_id):
     return db.get_or_404(User, user_id)
 
 
-# For adding profile images to the comment section
 gravatar = Gravatar(app,
                     size=100,
                     rating='g',
@@ -79,6 +83,15 @@ class Comment(db.Model):
     comment_author = relationship("User", back_populates="comments")
     post_id: Mapped[str] = mapped_column(Integer, db.ForeignKey("blog_posts.id"))
     parent_post = relationship("BlogPost", back_populates="comments")
+
+
+class ContactUser(UserMixin, db.Model):
+    __tablename__ = "ContactUser"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(Text, nullable=False)
+    email: Mapped[str] = mapped_column(Text, nullable=False)
+    phone_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    message: Mapped[str] = mapped_column(Text, nullable=False)
 
 
 with app.app_context():
@@ -232,9 +245,26 @@ def about():
     return render_template("about.html", current_user=current_user)
 
 
-@app.route("/contact")
+@app.route("/contact", methods=["GET", "POST"])
 def contact():
-    return render_template("contact.html", current_user=current_user)
+    form = ContactForm()
+    if form.validate_on_submit():
+        new_user = ContactUser(
+            email=form.email.data,
+            name=form.name.data,
+            phone_number = form.phone.data,
+            message = form.message.data,
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        # Authentication
+        response.login("deepakjgrt99@gmail.com", "eljlasisljrvlxkx")
+        message = f"We will get in touch with you very soon. And we resolve your queries as soon as possible"
+        response.sendmail("deepakjgrt99@gmail.com", f"{form.email.data}", message)
+        response.quit()
+        flash("Your Queries is Successfully Submitted, We will resolve it as soon as possible")
+        return redirect(url_for('contact'))
+    return render_template("contact.html", current_user=current_user, form=form)
 
 
 if __name__ == "__main__":
