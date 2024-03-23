@@ -1,4 +1,3 @@
-import smtplib
 from datetime import date
 from flask import Flask, abort, render_template, redirect, url_for, flash
 from flask_bootstrap import Bootstrap5
@@ -12,7 +11,6 @@ from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import relationship
 from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, ContactForm
-import requests
 import smtplib
 
 response = smtplib.SMTP("smtp.gmail.com", 587)
